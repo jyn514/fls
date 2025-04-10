@@ -46,3 +46,21 @@ impl Style {
         out.write(bytes);
     }
 }
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub struct RenderedHyperlink {
+    // dir: 
+    // style: Style,
+    // suffix: Option<u8>,
+}
+
+impl RenderedHyperlink {
+    #[inline(never)]
+    pub fn write_to(self, out: &mut OutputBuffer) {
+        use core::fmt::Write;
+        // todo!()
+        // out.wr
+        // wri
+        write!(out, "\x33]8;;file://{}{}\x07{}\x33]8;;", hostname, full_path, path);
+    }
+}

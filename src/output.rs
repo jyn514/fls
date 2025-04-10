@@ -526,6 +526,7 @@ pub struct OutputBuffer {
     style: Style,
     fd: i32,
     pub color: bool,
+    pub hyperlink: bool,
 }
 
 impl OutputBuffer {
@@ -535,6 +536,7 @@ impl OutputBuffer {
             buf_used: 0,
             style: Style::Reset,
             color: true,
+            hyperlink: true,
             fd,
         }
     }

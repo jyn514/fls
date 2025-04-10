@@ -32,9 +32,11 @@ pub struct App {
     pub print_owner: bool,
     pub print_group: bool,
     pub color: Color,
+    pub hyperlink: Hyperlink,
 
     pub args: Vec<CStr<'static>>,
 
+    hostname: &'static [u8],
     etc_passwd: &'static [u8],
     uid_names: Vec<(u32, (usize, usize))>,
     etc_group: &'static [u8],
@@ -47,6 +49,13 @@ pub struct App {
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Color {
+    Always,
+    Auto,
+    Never,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum Hyperlink {
     Always,
     Auto,
     Never,
@@ -129,6 +138,7 @@ impl App {
             print_owner: true,
             print_group: true,
             color: Color::Auto,
+            hyperlink: Hyperlink::Auto,
             out: OutputBuffer::to_fd(1),
             args: Vec::with_capacity(4),
             uid_names: Vec::new(),
@@ -150,6 +160,9 @@ impl App {
                     b"--color=never" => app.color = Color::Never,
                     b"--color=auto" => app.color = Color::Auto,
                     b"--color=always" => app.color = Color::Always,
+                    b"--hyperlink=never" => app.hyperlink = Hyperlink::Never,
+                    b"--hyperlink=auto" => app.hyperlink = Hyperlink::Auto,
+                    b"--hyperlink=always" => app.hyperlink = Hyperlink::Always,
                     b"--version" => print_version = true,
                     _ => {
                         error!("unrecognized option \'", arg, "\'\n");
@@ -301,6 +314,10 @@ impl App {
         }
         if app.color == Color::Never {
             app.out.color = false;
+        }
+        // TODO: use isatty?
+        if terminal_width.is_none() && app.hyperlink == Hyperlink::Auto {
+            app.out.hyperlink = false;
         }
 
         if app.display_mode == DisplayMode::Long {
